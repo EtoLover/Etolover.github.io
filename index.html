@@ -1,48 +1,102 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>数据可视化展示 - 示例站点</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>基于大数据平台的数据可视化</title>
+
   <link rel="stylesheet" href="style.css" />
+  <!-- ECharts -->
   <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>📊 数据可视化展示</h1>
-    <nav>
-      <a href="#bar">柱状图</a>
-      <a href="#line">折线图</a>
-      <a href="#pie">饼图</a>
-      <a href="#map">中国地图</a>
-    </nav>
-  </header>
+  <div class="container">
+    <header class="topbar">
+      <div class="title">
+        <h1>基于大数据平台的数据可视化</h1>
+        <p class="subtitle">科技风 · 世界五百强可视化示例（基于上传 Excel）</p>
+      </div>
+      <div class="controls">
+        <label>显示项：
+          <select id="viewMode">
+            <option value="top">按收入 Top10</option>
+            <option value="country">按国家汇总</option>
+          </select>
+        </label>
+        <button id="refreshBtn">刷新数据</button>
+      </div>
+    </header>
 
-  <main>
-    <section id="bar">
-      <h2>柱状图示例</h2>
-      <div class="chart" id="barChart"></div>
+    <section class="kpis">
+      <div class="card kpi">
+        <div class="kpi-title">公司总数</div>
+        <div class="kpi-value" id="kpi-count">--</div>
+        <div class="kpi-mini" id="kpi-count-mini"></div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-title">总营收（亿人民币）</div>
+        <div class="kpi-value" id="kpi-revenue">--</div>
+        <div class="kpi-mini" id="kpi-revenue-mini"></div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-title">总利润（亿人民币）</div>
+        <div class="kpi-value" id="kpi-profit">--</div>
+        <div class="kpi-mini" id="kpi-profit-mini"></div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-title">平均利润率</div>
+        <div class="kpi-value" id="kpi-margin">--</div>
+        <div class="kpi-mini" id="kpi-margin-mini"></div>
+      </div>
     </section>
 
-    <section id="line">
-      <h2>折线图示例</h2>
-      <div class="chart" id="lineChart"></div>
-    </section>
+    <main class="dashboard">
+      <div class="left-col">
+        <div class="panel card">
+          <h3>营收趋势（按排名累积折线）</h3>
+          <div id="lineChart" class="chart"></div>
+        </div>
 
-    <section id="pie">
-      <h2>饼图示例</h2>
-      <div class="chart" id="pieChart"></div>
-    </section>
+        <div class="panel card">
+          <h3>行业构成（饼图）</h3>
+          <div id="pieChart" class="chart small"></div>
+        </div>
 
-    <section id="map">
-      <h2>中国地图示例</h2>
-      <div class="chart" id="mapChart"></div>
-    </section>
-  </main>
+        <div class="panel card">
+          <h3>分行业/分国家明细（表格）</h3>
+          <div class="table-wrap">
+            <table id="dataTable">
+              <thead>
+                <tr><th>排名</th><th>公司</th><th>国家</th><th>行业</th><th>营收(亿)</th><th>利润(亿)</th><th>利润率</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-  <footer>
-    <p>© 2025 数据可视化示例网站 | 制作：23281065 朱宇豪</p>
-  </footer>
+      <div class="right-col">
+        <div class="panel card">
+          <h3>世界地图（国家营收总和）</h3>
+          <div id="mapChart" class="chart map"></div>
+        </div>
+
+        <div class="panel card">
+          <h3>营收 Top10 公司（柱状）</h3>
+          <div id="barChart" class="chart"></div>
+        </div>
+
+        <div class="panel card">
+          <h3>利润率分布（箱线/折线示意）</h3>
+          <div id="marginChart" class="chart small"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span>© 2025 基于大数据平台的数据可视化 · 示例</span>
+    </footer>
+  </div>
 
   <script src="script.js"></script>
 </body>
