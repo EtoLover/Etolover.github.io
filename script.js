@@ -4,7 +4,6 @@ const DATA = [
   { "rank": 1, "name": "沃尔玛（WALMART)", "industry": "零售", "revenue": 36602.583611, "profit": 884.37811, "margin": 0.02416163075806, "country": "美国" },
   { "rank": 2, "name": "国家电网有限公司（STATE GRID)", "industry": "能源/矿产/化工", "revenue": 25308.3812597, "profit": 365.2985644, "margin": 0.0144338968443504, "country": "中国" },
   { "rank": 3, "name": "亚马逊（AMAZON.COM)", "industry": "互联网/软件/咨询", "revenue": 25272.135504, "profit": 1396.348591, "margin": 0.0552524969953168, "country": "美国" },
-   { "rank": 3, "name": "亚马逊（AMAZON.COM)", "industry": "互联网/软件/咨询", "revenue": 25272.135504, "profit": 1396.348591, "margin": 0.0552524969953168, "country": "美国" },
   { "rank": 4, "name": "中国石油天然气集团有限公司（CHINA NATIONAL PETROLEUM)", "industry": "能源/矿产/化工", "revenue": 18588.1484536, "profit": 299.4971672, "margin": 0.0161122646479615, "country": "中国" },
   { "rank": 5, "name": "中国石油化工集团有限公司（SINOPEC GROUP)", "industry": "能源/矿产/化工", "revenue": 18573.0924236, "profit": 406.1985972, "margin": 0.0218702727545716, "country": "中国" },
   { "rank": 6, "name": "苹果公司（APPLE)", "industry": "电子/电器/机械", "revenue": 18104.9142828, "profit": 3522.6136113, "margin": 0.194564253139366, "country": "美国" },
