@@ -201,6 +201,7 @@ const DATA = [
   { "rank": 198, "name": "中国工商银行股份有限公司（INDUSTRIAL & COMMERCIAL BANK OF CHINA)", "industry": "金融", "revenue": 6962.6568444, "profit": 1823.0486057, "margin": 0.261821811802998, "country": "中国" },
   { "rank": 199, "name": "中国建筑集团有限公司（CHINA STATE CONSTRUCTION ENGINEERING)", "industry": "建筑", "revenue": 6945.7952865, "profit": 299.4971672, "margin": 0.0431189410100706, "country": "中国" },
   { "rank": 200, "name": "中国建设银行股份有限公司（CHINA CONSTRUCTION BANK)", "industry": "金融", "revenue": 6928.9796791, "profit": 1786.534571, "margin": 0.257827829777109, "country": "中国" },
+];
 
  const numberFormat = num => num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const percentFormat = num => (num * 100).toFixed(2) + '%';
