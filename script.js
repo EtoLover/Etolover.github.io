@@ -250,9 +250,33 @@ function calculateBoxplotData(data) {
   const q3 = getQuantile(margins, 0.75);
   const max = margins[margins.length - 1];
 
-  return [min, q1, median, q3, max];
-}
+  // 计算四分位距 IQR 和上下限，用于识别异常值（离群点）
+  const iqr = q3 - q1;
+  const lowerBound = q1 - 1.5 * iqr;
+  const upperBound = q3 + 1.5 * iqr;
 
+  // 找到不被视为异常值的最大最小值
+  let whiskerMin = min;
+  for (let i = 0; i < margins.length; i++) {
+    if (margins[i] >= lowerBound) {
+      whiskerMin = margins[i];
+      break;
+    }
+  }
+
+  let whiskerMax = max;
+  for (let i = margins.length - 1; i >= 0; i--) {
+    if (margins[i] <= upperBound) {
+      whiskerMax = margins[i];
+      break;
+    }
+  }
+  
+  // ECharts boxplot 的数据格式：[最小, Q1, 中位, Q3, 最大]
+  // 这里的最小和最大应该使用“触须”的上下限
+  return [whiskerMin, q1, median, q3, whiskerMax]; 
+  // 注意：异常值需要单独在 ECharts 的 data 中定义
+}
 // ---------- 初始化 ECharts 实例
 const lineChart = echarts.init(document.getElementById('lineChart'));
 const pieChart = echarts.init(document.getElementById('pieChart'));
@@ -357,7 +381,32 @@ function renderBar(data) {
 
 // ---------- 渲染利润率分布图
 function renderMargin(data) {
-  const boxplotData = calculateBoxplotData(data).map(x => x * 100); // 转换为百分比
+  // 重新计算箱线图数据，确保使用触须值
+  const margins = data.map(item => item.margin).filter(m => !isNaN(m));
+  const boxplotDataRaw = calculateBoxplotData(data); // 包含触须上下限
+  
+  // 找出异常值
+  const q1 = boxplotDataRaw[1];
+  const q3 = boxplotDataRaw[3];
+  const iqr = q3 - q1;
+  const lowerBound = q1 - 1.5 * iqr;
+  const upperBound = q3 + 1.5 * iqr;
+  
+  const outliers = margins.filter(m => m < lowerBound || m > upperBound).map((m, index) => [0, m * 100]); // 离群点格式：[类别索引，值]
+
+  // 将箱线图数据转换为百分比，并格式化为 ECharts 要求
+  const boxplotDisplayData = boxplotDataRaw.map(x => x * 100); 
+
+  // 获取所有利润率值（用于计算 Y 轴范围）
+  const allValues = margins.map(x => x * 100);
+  const dataMin = Math.min(...allValues);
+  const dataMax = Math.max(...allValues);
+  
+  // 确定 Y 轴范围，稍微超出数据的最大最小值
+  const padding = (dataMax - dataMin) * 0.1 || 10; // 至少 10% 的内边距，如果没有范围则为 10
+  const yAxisMin = Math.floor((dataMin - padding) / 10) * 10;
+  const yAxisMax = Math.ceil((dataMax + padding) / 10) * 10;
+  
   const marginOption = {
     title: [{
       text: '利润率分布',
@@ -369,28 +418,58 @@ function renderMargin(data) {
       axisPointer: { type: 'shadow' },
       formatter: function(params) {
         if (params.seriesType === 'boxplot') {
+          // params.data 已经是 [whiskerMin, Q1, median, Q3, whiskerMax] 的百分比形式
           return [
             '利润率分布:',
-            '最小: ' + numberFormat(params.data[1]) + '%',
+            '最小（触须）: ' + numberFormat(params.data[1]) + '%',
             'Q1: ' + numberFormat(params.data[2]) + '%',
             '中位数: ' + numberFormat(params.data[3]) + '%',
             'Q3: ' + numberFormat(params.data[4]) + '%',
-            '最大: ' + numberFormat(params.data[5]) + '%'
+            '最大（触须）: ' + numberFormat(params.data[5]) + '%'
           ].join('<br/>');
+        } else if (params.seriesType === 'scatter') {
+          return '异常值: ' + numberFormat(params.value[1]) + '%';
         }
         return '';
       }
     },
     grid: { left: '3%', right: '4%', bottom: '15%', containLabel: true },
-    xAxis: { type: 'category', data: ['全球'], boundaryGap: true, nameGap: 30, splitArea: { show: false }, splitLine: { show: false }, axisLabel: { color: '#9fb7d8' } },
-    yAxis: { type: 'value', name: '利润率 (%)', splitArea: { show: true, areaStyle: { color: ['rgba(255,255,255,0.01)', 'transparent'] } }, axisLabel: { color: '#9fb7d8', formatter: '{value}%' }, splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } },
+    xAxis: { 
+      type: 'category', 
+      data: ['全球'], 
+      boundaryGap: true, 
+      nameGap: 30, 
+      splitArea: { show: false }, 
+      splitLine: { show: false }, 
+      axisLabel: { color: '#9fb7d8' } 
+    },
+    yAxis: { 
+      type: 'value', 
+      name: '利润率 (%)', 
+      min: yAxisMin, // 动态设置 Y 轴最小值
+      max: yAxisMax, // 动态设置 Y 轴最大值
+      splitArea: { 
+        show: true, 
+        areaStyle: { color: ['rgba(255,255,255,0.01)', 'transparent'] } 
+      }, 
+      axisLabel: { color: '#9fb7d8', formatter: '{value}%' }, 
+      splitLine: { lineStyle: { color: 'rgba(255,255,255,0.05)' } } 
+    },
     series: [
       {
         name: '利润率箱线图',
         type: 'boxplot',
-        data: [boxplotData],
-        tooltip: { formatter: params => params.name + '<br/>' + params.value.join('<br/>') },
+        data: [boxplotDisplayData],
+        // 简化 tooltip，因为上面已经定义了详细的 formatter
+        tooltip: { show: true }, 
         itemStyle: { borderColor: '#38bdf8' }
+      },
+      {
+        name: '异常值',
+        type: 'scatter',
+        data: outliers,
+        symbolSize: 8,
+        itemStyle: { color: '#e64e4e' }
       }
     ]
   };
