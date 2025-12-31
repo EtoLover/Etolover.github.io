@@ -1,75 +1,146 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
-  <title>世界500强企业大数据可视化平台</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
-  <!-- ECharts -->
-  <script src="https://cdn.jsdelivr.net/npm/echarts/dist/echarts.min.js"></script>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>基于大数据平台的数据可视化</title>
 
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
 </head>
 <body>
-  <header>
-    <h1>世界500强企业大数据可视化平台</h1>
-    <p>基于 Hadoop + Spark 的离线分析与可视化展示（课程实验项目）</p>
-  </header>
+  <div class="container">
+    <header class="topbar">
+      <div class="title">
+        <h1>基于大数据平台的数据可视化</h1>
+        <p class="subtitle">23281065  朱宇豪</p>
+      </div>
+      <div class="controls">
+        <label>显示项：
+          <select id="viewMode">
+            <option value="top">按收入 Top10</option>
+            <option value="country">按国家汇总</option>
+          </select>
+        </label>
+        <button id="refreshBtn">刷新数据</button>
+      </div>
+    </header>
 
-  <!-- 技术架构 -->
-  <section class="card">
-    <h2>系统技术架构</h2>
-    <ul>
-      <li><b>数据采集：</b> Fortune Global 500 企业数据（CSV）</li>
-      <li><b>分布式存储：</b> Hadoop HDFS</li>
-      <li><b>数据仓库：</b> Hive</li>
-      <li><b>离线计算：</b> Spark SQL</li>
-      <li><b>结果存储：</b> MySQL</li>
-      <li><b>缓存层：</b> Redis（Top10 指标缓存）</li>
-      <li><b>服务接口：</b> Spring Boot RESTful API</li>
-      <li><b>前端展示：</b> ECharts + JavaScript</li>
-    </ul>
-  </section>
+    <section class="kpis">
+      <div class="card kpi">
+        <div class="kpi-title">公司总数</div>
+        <div class="kpi-value" id="kpi-count">--</div>
+        <div class="kpi-mini" id="kpi-count-mini"></div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-title">总营收（亿人民币）</div>
+        <div class="kpi-value" id="kpi-revenue">--</div>
+        <div class="kpi-mini" id="kpi-revenue-mini"></div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-title">总利润（亿人民币）</div>
+        <div class="kpi-value" id="kpi-profit">--</div>
+        <div class="kpi-mini" id="kpi-profit-mini"></div>
+      </div>
+      <div class="card kpi">
+        <div class="kpi-title">平均利润率</div>
+        <div class="kpi-value" id="kpi-margin">--</div>
+        <div class="kpi-mini" id="kpi-margin-mini"></div>
+      </div>
+    </section>
 
-  <!-- KPI -->
-  <section class="card kpi">
-    <div>
-      <h3 id="kpi-count">-</h3>
-      <p>企业数量</p>
+    <main class="dashboard">
+      <!-- ===== 新增：后端大数据技术栈说明（展示用，不影响原页面）===== -->
+<section class="panel card backend-panel">
+  <h3>系统架构与后端技术栈（展示说明）</h3>
+  <p class="desc">
+    本数据可视化系统基于大数据平台构建，前端通过 REST API
+    从后端数据服务获取经清洗、聚合后的企业经营数据。
+  </p>
+
+  <div class="tech-grid">
+    <div class="tech">
+      <h4>数据采集层</h4>
+      <ul>
+        <li>Python + Pandas（Excel / CSV 批量清洗）</li>
+        <li>定时任务：Linux Crontab</li>
+      </ul>
     </div>
-    <div>
-      <h3 id="kpi-revenue">-</h3>
-      <p>总营收（亿美元）</p>
-    </div>
-    <div>
-      <h3 id="kpi-profit">-</h3>
-      <p>总利润（亿美元）</p>
-    </div>
-    <div>
-      <h3 id="kpi-margin">-</h3>
-      <p>平均利润率</p>
-    </div>
-  </section>
 
-  <!-- 图表 -->
-  <section class="card">
-    <h2>企业营收 Top10（Redis 缓存数据）</h2>
-    <div id="barChart" class="chart"></div>
-  </section>
+    <div class="tech">
+      <h4>大数据处理层</h4>
+      <ul>
+        <li>Hadoop HDFS（原始数据存储）</li>
+        <li>Hive（企业财务数据建模）</li>
+        <li>Spark SQL（聚合 & 统计分析）</li>
+      </ul>
+    </div>
 
-  <section class="card">
-    <h2>企业利润分布情况</h2>
-    <div id="pieChart" class="chart"></div>
-  </section>
+    <div class="tech">
+      <h4>后端服务层</h4>
+      <ul>
+        <li>Spring Boot（REST API）</li>
+        <li>MySQL（结果数据缓存）</li>
+        <li>Redis（热点指标缓存）</li>
+      </ul>
+    </div>
 
-  <footer>
-    <p>
-      本系统为课程实验项目，数据分析流程基于 Hadoop / Hive / Spark 模拟实现  
-    </p>
-    <p>
-      前端页面部署于 GitHub Pages
-    </p>
-  </footer>
+    <div class="tech">
+      <h4>前端可视化层</h4>
+      <ul>
+        <li>HTML + CSS + JavaScript</li>
+        <li>ECharts 5（图表渲染）</li>
+        <li>GitHub Pages 静态部署</li>
+      </ul>
+    </div>
+  </div>
+
+  <p class="note">
+    ※ 当前页面为前端展示版本，实际系统中数据由后端接口动态返回。
+  </p>
+</section>
+
+      <div class="left-col">
+        <div class="panel card">
+          <h3>营收趋势（按排名累积折线）</h3>
+          <div id="lineChart" class="chart"></div>
+        </div>
+
+        <div class="panel card">
+          <h3>行业构成（饼图）</h3>
+          <div id="pieChart" class="chart small"></div>
+        </div>
+
+        <div class="panel card">
+          <h3>分行业/分国家明细（表格）</h3>
+          <div class="table-wrap">
+            <table id="dataTable">
+              <thead>
+                <tr><th>排名</th><th>公司</th><th>国家</th><th>行业</th><th>营收(亿)</th><th>利润(亿)</th><th>利润率</th></tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="right-col">
+        <div class="panel card">
+          <h3>营收 Top10 公司（柱状）</h3>
+          <div id="barChart" class="chart"></div>
+        </div>
+
+        <div class="panel card">
+          <h3>利润率分布（箱线/折线示意）</h3>
+          <div id="marginChart" class="chart small"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <span>© 2025 基于大数据平台的数据可视化 </span>
+    </footer>
+  </div>
 
   <script src="script.js"></script>
 </body>
