@@ -563,3 +563,13 @@ function mockFetch(url) {
     console.log("[MockAPI] 明细数据来自 MySQL / HDFS", res.data.length);
   });
 })();
+
+// ===== 新增：布局变化后强制 ECharts 重新计算尺寸 =====
+window.addEventListener("resize", () => {
+  if (window.echarts) {
+    document.querySelectorAll(".chart").forEach(dom => {
+      const instance = echarts.getInstanceByDom(dom)
+      if (instance) instance.resize()
+    })
+  }
+})
