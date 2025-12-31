@@ -106,3 +106,45 @@ async function renderPieChart() {
 loadKpi()
 renderBarChart()
 renderPieChart()
+// ===== 新增：模拟后端 API 行为（仅用于展示“像真系统”）=====
+
+// 模拟后端接口地址（展示用）
+const API_ENDPOINTS = {
+  summary: "/api/v1/summary",
+  list: "/api/v1/company/list",
+  industry: "/api/v1/industry/stat"
+};
+
+// 模拟接口请求（不影响现有 DATA 使用）
+function mockFetch(url) {
+  return new Promise(resolve => {
+    console.log("[MockAPI] 请求接口：", url);
+
+    setTimeout(() => {
+      if (url === API_ENDPOINTS.summary) {
+        resolve({
+          code: 200,
+          data: {
+            totalCompany: DATA.length,
+            totalRevenue: DATA.reduce((s, d) => s + d.revenue, 0),
+            totalProfit: DATA.reduce((s, d) => s + d.profit, 0)
+          }
+        });
+      } else {
+        resolve({ code: 200, data: DATA });
+      }
+    }, 300); // 模拟网络 & Spark 计算延迟
+  });
+}
+
+// 页面加载时“走一遍后端流程”
+(function initBackendLikeFlow() {
+  mockFetch(API_ENDPOINTS.summary).then(res => {
+    console.log("[MockAPI] 汇总数据来自 Spark SQL / Hive", res.data);
+  });
+
+  mockFetch(API_ENDPOINTS.list).then(res => {
+    console.log("[MockAPI] 明细数据来自 MySQL / HDFS", res.data.length);
+  });
+})();
+
